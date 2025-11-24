@@ -1,0 +1,41 @@
+# CMake
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+*.cmake
+!CMakeLists.txt
+
+# CLion
+.idea/
+cmake-build-*/
+
+# 构建输出目录（CLion自动生成）
+cmake-build-debug/
+cmake-build-release/
+
+# 编译输出
+*.exe
+*.dll
+*.lib
+*.obj
+*.pdb
+*.ilk
+*.exp
+
+# Visual Studio (如果存在)
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.suo
+*.user
+
+# 临时文件
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+

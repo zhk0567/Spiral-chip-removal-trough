@@ -1,0 +1,23 @@
+#include "resource.h"
+#include <windows.h>
+
+// 版本信息（可选）
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "FileDescription", "螺旋排屑槽绘制工具"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "ProductName", "SpiralGrooveTool"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
