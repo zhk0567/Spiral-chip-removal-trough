@@ -1,78 +1,143 @@
-# 螺旋排屑槽绘制工具
+# 螺旋排屑槽设计工具
 
-## 简介
+## 🎯 项目简介
 
-独立的Windows图形绘制工具，使用AutoCAD COM API生成和优化图形数据，图形显示在本程序窗口中。
+这是一个**开源的螺旋排屑槽设计工具**，基于对商业CAD软件的逆向分析结果，完全独立实现。无需安装任何商业软件，即可进行专业的刀具设计计算和可视化。
 
-## 功能
+**核心功能**：参数化设计螺旋排屑槽，生成精确的几何数据和可视化图形。
 
-- 输入参数：螺旋角、钻头直径、钻头总长、刀瓣宽度、刀瓣高度
-- 自动生成二维展开图
-- 使用AutoCAD API优化图形数据（如果AutoCAD可用）
-- 在本程序窗口中显示图形
+## ✨ 主要特性
 
-## 编译和运行
+- 🔬 **精确计算**：基于螺旋线几何理论的纯数学计算
+- 📊 **实时可视化**：自动生成高清设计图形
+- 📁 **多格式输出**：CSV数据文件 + PNG图形文件
+- 🎛️ **参数化设计**：灵活调整螺旋角、直径、长度等参数
+- 🔧 **专业级精度**：适合工业制造和CAD/CAM应用
+- 📖 **开源透明**：代码公开，可验证计算过程
 
-### 使用CLion
+## 🚀 快速开始
 
-1. 打开CLion
-2. 选择 `File` -> `Open`，选择项目根目录
-3. CLion会自动检测CMakeLists.txt并配置项目
-4. 点击运行按钮或按 `Shift+F10` 运行程序
+### 1. 环境要求
+- Python 3.6+
+- matplotlib (绘图库)
 
-### 使用CMake命令行
-
+### 2. 安装依赖
 ```bash
-mkdir build
-cd build
-cmake ..
-cmake --build . --config Debug
+pip install matplotlib
 ```
 
-运行：
+### 3. 运行程序
 ```bash
-bin/SpiralGrooveTool.exe
+python spiral_groove_designer.py
 ```
 
-## 使用
+程序将自动：
+- 计算螺旋排屑槽几何数据
+- 显示实时图形预览
+- 生成CSV数据文件
+- 保存高清PNG图像
 
-1. 运行程序后，在左侧输入框中输入5个参数
-2. 点击"生成图形（使用AutoCAD API）"按钮
-3. 程序会尝试使用AutoCAD API优化图形数据（如果AutoCAD已安装）
-4. 图形显示在右侧窗口中
+## 📋 输出文件
 
-## 技术
+| 文件名 | 内容 | 用途 |
+|--------|------|------|
+| `spiral_center.csv` | 螺旋槽中心线坐标 | CAD导入绘制中心线 |
+| `spiral_boundaries.csv` | 排屑槽边界坐标 | CAD导入绘制排屑区域 |
+| `tool_outline.csv` | 刀具轮廓坐标 | CAD导入绘制刀具外形 |
+| `spiral_groove_plot.png` | 高清设计图形 | 设计结果可视化 |
 
-- 语言：C++
-- CAD接口：AutoCAD COM API（用于图形数据优化）
-- 图形显示：Windows GDI+
-- 构建系统：CMake
-- 平台：Windows 7+
-- 可选依赖：AutoCAD（如果已安装，会使用其API优化图形）
+## 🎨 图形预览
 
-## 关于AutoCAD API
+程序生成的图形包含：
+- **左侧**：螺旋排屑槽展开图（中心线、边界线、刀具轮廓）
+- **右侧**：3D效果模拟图（螺旋线空间形态）
+- **底部**：完整的设计参数和计算结果
 
-**注意**：AutoCAD本身**没有直接生成螺旋排屑槽的API**。本程序使用以下方法：
+## 🔧 技术实现
 
-1. **自定义计算**：使用数学公式计算螺旋槽的展开图
-2. **AutoCAD优化**（可选）：如果AutoCAD可用，使用其几何计算API优化点数据
-3. **可用的AutoCAD API**：
-   - `AddPolyline` - 创建多段线
-   - `AddSpline` - 创建样条曲线
-   - `AddHelix` - 创建螺旋线（部分版本支持，但主要用于3D，不适用于2D展开图）
+### 核心算法
+```python
+# 螺距计算
+pitch = circumference / tan(螺旋角)
 
-本程序主要使用自定义算法生成2D展开图，AutoCAD API仅用于可选的几何优化。
+# 展开坐标
+y = (x / pitch) * circumference
 
-## 项目结构
+# 边界偏移
+y_left = y_center + bladeWidth/2
+y_right = y_center - bladeWidth/2
+```
+
+### 技术栈
+- **计算引擎**：Python 纯数学实现
+- **可视化**：matplotlib 高质量绘图
+- **数据输出**：CSV 标准格式
+- **验证**：内置参数检查和计算验证
+
+## 📖 使用示例
+
+### 基本使用
+```python
+from spiral_groove_designer import SpiralGrooveCalculator
+
+# 计算螺旋槽
+center_points = SpiralGrooveCalculator.calculate_spiral_groove(
+    spiral_angle=30.0,      # 螺旋角（度）
+    drill_diameter=10.0,    # 钻头直径（mm）
+    total_length=50.0,      # 钻头总长（mm）
+    blade_width=2.0,        # 刀瓣宽度（mm）
+    blade_height=1.0        # 刀瓣高度（mm）
+)
+
+# 计算边界
+boundaries = SpiralGrooveCalculator.calculate_boundaries(center_points, blade_width)
+
+# 计算轮廓
+outline = SpiralGrooveCalculator.calculate_tool_outline(drill_diameter, total_length)
+```
+
+### 设计参数范围
+| 参数 | 说明 | 范围 |
+|------|------|------|
+| spiral_angle | 螺旋角 | 0° < angle < 90° |
+| drill_diameter | 钻头直径 | > 0 mm |
+| total_length | 钻头总长 | > 0 mm |
+| blade_width | 刀瓣宽度 | > 0 mm |
+| blade_height | 刀瓣高度 | > 0 mm |
+
+## 🎯 应用场景
+
+- **刀具设计**：螺旋排屑槽几何建模
+- **CAD绘图**：参数化曲线生成
+- **制造工程**：CAM编程数据准备
+- **教育教学**：螺旋线几何原理演示
+- **研究开发**：刀具优化算法验证
+
+## 📚 项目文件
 
 ```
 .
-├── CMakeLists.txt          # CMake配置文件
-├── SpiralGrooveTool/
-│   ├── main.cpp            # 程序入口
-│   ├── MainWindow.h/cpp   # 主窗口和绘制
-│   ├── SpiralCalculator.h/cpp # 螺旋槽计算
-│   ├── AutoCADDrawer.h/cpp # AutoCAD API调用（图形优化）
-│   └── SpiralGrooveTool.rc  # 资源文件
-└── README.md
+├── spiral_groove_designer.py     # 主程序
+├── example_designs.py           # 示例脚本
+├── test_calculation.py          # 计算验证
+├── 使用说明.md                  # 详细文档
+├── 项目结构说明.md              # 项目架构
+├── final_analysis_report.md     # 技术分析
+├── 开发文档.md                  # 原始文档
+└── README.md                    # 本文件
 ```
+
+## 🤝 技术来源
+
+本工具基于对商业CAD软件的逆向分析，提取了其中的核心算法，并使用开源技术完全重新实现。所有计算公式和方法都是公开可验证的。
+
+## 📄 许可证
+
+本项目仅用于技术学习和研究目的。请遵守相关法律法规。
+
+---
+
+**开发语言**: Python 3
+**绘图库**: matplotlib
+**数据格式**: CSV + PNG
+**适用平台**: 跨平台（Windows/macOS/Linux）
