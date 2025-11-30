@@ -1,143 +1,145 @@
-# 螺旋排屑槽设计工具
+# 螺旋排屑槽三维CAD建模工具
 
-## 🎯 项目简介
+## 项目简介
 
-这是一个**开源的螺旋排屑槽设计工具**，基于对商业CAD软件的逆向分析结果，完全独立实现。无需安装任何商业软件，即可进行专业的刀具设计计算和可视化。
+这是一个**螺旋排屑槽三维CAD建模工具**，使用Python直接生成带螺旋槽的圆柱体3D模型，支持Open3D专业可视化。
 
-**核心功能**：参数化设计螺旋排屑槽，生成精确的几何数据和可视化图形。
+**核心功能**：参数化设计螺旋排屑槽，生成3D mesh模型和交互式可视化。
 
-## ✨ 主要特性
+## 主要特性
 
-- 🔬 **精确计算**：基于螺旋线几何理论的纯数学计算
-- 📊 **实时可视化**：自动生成高清设计图形
-- 📁 **多格式输出**：CSV数据文件 + PNG图形文件
+- 🎯 **直接生成法**：不使用复杂的布尔运算，直接生成带螺旋槽的mesh
+- 📊 **专业可视化**：使用Open3D进行高性能3D可视化
 - 🎛️ **参数化设计**：灵活调整螺旋角、直径、长度等参数
-- 🔧 **专业级精度**：适合工业制造和CAD/CAM应用
-- 📖 **开源透明**：代码公开，可验证计算过程
+- 🖱️ **交互式调整**：实时调整参数并预览3D模型（使用`--interactive`参数）
+- ✏️ **边缘描边**：自动添加关键几何边缘的粗线条描边，使用不同颜色区分不同类型的边缘
+- 🔄 **自然交汇**：螺旋槽从z=0开始，自然交汇形成平滑的椭圆形顶部闭合
+- 📐 **专业级精度**：适合工业制造和CAD/CAM应用
 
-## 🚀 快速开始
+## 快速开始
 
 ### 1. 环境要求
-- Python 3.6+
-- matplotlib (绘图库)
+- Python 3.8+
+- trimesh（必需）
+- open3d（必需，用于3D可视化）
+- matplotlib（必需，用于交互式参数调整）
 
 ### 2. 安装依赖
 ```bash
-pip install matplotlib
+pip install trimesh open3d matplotlib numpy
 ```
 
 ### 3. 运行程序
+
+**标准模式**（Open3D可视化）：
 ```bash
-python spiral_groove_designer.py
+python spiral_groove_3d_cad.py
 ```
 
-程序将自动：
-- 计算螺旋排屑槽几何数据
-- 显示实时图形预览
-- 生成CSV数据文件
-- 保存高清PNG图像
+**交互式参数调整模式**（实时调整参数并预览）：
+```bash
+python spiral_groove_3d_cad.py --interactive
+```
 
-## 📋 输出文件
+在交互式模式下：
+- 拖动滑块调整参数（D1、L1、L2、A1、槽深、槽数）
+- 3D模型会实时更新
+- 点击"Open3D查看"按钮在Open3D中查看高质量3D模型
 
-| 文件名 | 内容 | 用途 |
-|--------|------|------|
-| `spiral_center.csv` | 螺旋槽中心线坐标 | CAD导入绘制中心线 |
-| `spiral_boundaries.csv` | 排屑槽边界坐标 | CAD导入绘制排屑区域 |
-| `tool_outline.csv` | 刀具轮廓坐标 | CAD导入绘制刀具外形 |
-| `spiral_groove_plot.png` | 高清设计图形 | 设计结果可视化 |
+## 参数说明
 
-## 🎨 图形预览
+- **D1**：刀具直径 (mm)
+- **L1**：导向长度 (mm) - 从z=0到螺旋槽起始位置的长度，螺旋槽在此范围内深度逐渐增加
+- **L2**：排屑槽长度 (mm) - 螺旋槽的完整长度，从L1位置开始
+- **A1**：螺旋角 (度) - 螺旋槽的螺旋角度
+- **blade_height**：槽深 (mm) - 螺旋槽的深度
+- **num_flutes**：螺旋槽数量（通常为2或3）
 
-程序生成的图形包含：
-- **左侧**：螺旋排屑槽展开图（中心线、边界线、刀具轮廓）
-- **右侧**：3D效果模拟图（螺旋线空间形态）
-- **底部**：完整的设计参数和计算结果
+**注意**：螺旋槽从z=0开始延伸，在z=0处所有槽会自然交汇形成一个平滑的椭圆形顶部闭合点。
 
-## 🔧 技术实现
+## 输出文件
+
+- `spiral_groove_front.png`：前视图截图（如果使用Open3D截图功能）
+
+## 可视化说明
+
+### Open3D可视化
+- 高性能3D可视化，支持交互式旋转、缩放、平移
+- 自动添加关键边缘描边，使用不同颜色区分：
+  - 下端面圆周：蓝色
+  - 上端面圆周：绿色
+  - 螺旋槽边缘：多种颜色区分不同类型的边缘线
+- 窗口标题显示所有参数值
+- 初始视图设置为XZ正方向视角
+
+### 交互式参数调整
+- 使用matplotlib滑块实时调整参数
+- 3D模型实时更新
+- 支持在Open3D中查看高质量模型
+
+## 技术实现
 
 ### 核心算法
-```python
-# 螺距计算
-pitch = circumference / tan(螺旋角)
+- **直接mesh生成**：使用参数化方法直接生成mesh，避免复杂的布尔运算
+- **平滑过渡**：使用cos曲线和指数函数实现平滑的边缘过渡
+- **自然交汇**：螺旋槽从z=0开始，在z=0处半径逐渐缩小到0，形成自然交汇
+- **自动mesh修复**：使用trimesh和Open3D的mesh修复功能，确保模型质量
 
-# 展开坐标
-y = (x / pitch) * circumference
+### 几何特性
+- **螺旋槽范围**：从z=0延伸到L1+L2
+- **槽深过渡**：在z<L1时，槽深度逐渐减小，在z=0时为0
+- **半径收敛**：在z<L1时，半径逐渐缩小到0，形成自然交汇点
+- **边缘描边**：自动提取并绘制关键几何边缘，包括：
+  - 槽与圆柱外边缘的交界线（峰的位置）
+  - 槽的侧面边缘线
+  - 槽的"锋"边缘线（过渡区域）
+  - 槽的起始端和结束端边缘线
 
-# 边界偏移
-y_left = y_center + bladeWidth/2
-y_right = y_center - bladeWidth/2
-```
+### 性能优化
+- 支持高分辨率网格（默认400×160采样点）
+- 交互式模式使用较低分辨率以提高响应速度
+- 边缘描边使用管道（tube）mesh实现，支持批量处理
 
-### 技术栈
-- **计算引擎**：Python 纯数学实现
-- **可视化**：matplotlib 高质量绘图
-- **数据输出**：CSV 标准格式
-- **验证**：内置参数检查和计算验证
-
-## 📖 使用示例
+## 使用示例
 
 ### 基本使用
 ```python
-from spiral_groove_designer import SpiralGrooveCalculator
+from spiral_groove_3d_cad import create_spiral_groove_mesh, visualize_open3d
 
-# 计算螺旋槽
-center_points = SpiralGrooveCalculator.calculate_spiral_groove(
-    spiral_angle=30.0,      # 螺旋角（度）
-    drill_diameter=10.0,    # 钻头直径（mm）
-    total_length=50.0,      # 钻头总长（mm）
-    blade_width=2.0,        # 刀瓣宽度（mm）
-    blade_height=1.0        # 刀瓣高度（mm）
+# 创建模型
+mesh, params = create_spiral_groove_mesh(
+    D1=10.0,           # 直径10mm
+    L1=5.0,            # 导向长度5mm
+    L2=150.0,          # 排屑槽长度150mm
+    A1=40.0,           # 螺旋角40度
+    blade_height=1.5,   # 槽深1.5mm
+    num_flutes=3       # 3个螺旋槽
 )
 
-# 计算边界
-boundaries = SpiralGrooveCalculator.calculate_boundaries(center_points, blade_width)
-
-# 计算轮廓
-outline = SpiralGrooveCalculator.calculate_tool_outline(drill_diameter, total_length)
+# 可视化
+visualize_open3d(mesh, params=params, interactive=True)
 ```
 
-### 设计参数范围
-| 参数 | 说明 | 范围 |
-|------|------|------|
-| spiral_angle | 螺旋角 | 0° < angle < 90° |
-| drill_diameter | 钻头直径 | > 0 mm |
-| total_length | 钻头总长 | > 0 mm |
-| blade_width | 刀瓣宽度 | > 0 mm |
-| blade_height | 刀瓣高度 | > 0 mm |
+## 注意事项
 
-## 🎯 应用场景
+1. **Open3D必需**：程序需要Open3D库进行3D可视化，请确保已正确安装
+2. **Windows系统**：在Windows上可能需要安装Visual C++ Redistributable
+3. **性能考虑**：高分辨率模型可能需要较长的生成时间，建议在交互式模式下使用较低分辨率
+4. **参数范围**：建议参数在合理范围内，避免极端值导致模型异常
 
-- **刀具设计**：螺旋排屑槽几何建模
-- **CAD绘图**：参数化曲线生成
-- **制造工程**：CAM编程数据准备
-- **教育教学**：螺旋线几何原理演示
-- **研究开发**：刀具优化算法验证
+## 更新日志
 
-## 📚 项目文件
+### 最新版本
+- ✅ 实现螺旋槽从z=0开始，自然交汇形成椭圆形顶部
+- ✅ 添加边缘描边功能，使用不同颜色区分不同类型的边缘
+- ✅ 优化可视化性能，支持高分辨率模型
+- ✅ 移除STL文件生成，专注于Open3D可视化
+- ✅ 改进交互式参数调整界面
 
-```
-.
-├── spiral_groove_designer.py     # 主程序
-├── example_designs.py           # 示例脚本
-├── test_calculation.py          # 计算验证
-├── 使用说明.md                  # 详细文档
-├── 项目结构说明.md              # 项目架构
-├── final_analysis_report.md     # 技术分析
-├── 开发文档.md                  # 原始文档
-└── README.md                    # 本文件
-```
+## 许可证
 
-## 🤝 技术来源
+本项目仅供学习和研究使用。
 
-本工具基于对商业CAD软件的逆向分析，提取了其中的核心算法，并使用开源技术完全重新实现。所有计算公式和方法都是公开可验证的。
+## 联系方式
 
-## 📄 许可证
-
-本项目仅用于技术学习和研究目的。请遵守相关法律法规。
-
----
-
-**开发语言**: Python 3
-**绘图库**: matplotlib
-**数据格式**: CSV + PNG
-**适用平台**: 跨平台（Windows/macOS/Linux）
+如有问题或建议，请提交Issue或联系开发者。
