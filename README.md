@@ -1,13 +1,21 @@
 # 螺旋排屑槽三维CAD建模工具
 
+## 作品简介
+
+本作品开发了参数化螺旋排屑槽CAD建模系统，实现3D到2D完整工作流。采用直接mesh生成算法，通过参数化方程构建螺旋槽表面，避免布尔运算误差。核心功能：参数化输入（D1、L1、L2、A1）、3D可视化、2D侧视图生成、线条提取去重。设计思路：使用螺旋线公式和指数函数实现平滑过渡，螺旋槽从z=0自然交汇形成椭圆形顶部。创新点：直接生成法提高精度效率、交互式参数调整。
+
 ## 项目简介
 
-这是一个**螺旋排屑槽三维CAD建模工具**，使用Python直接生成带螺旋槽的圆柱体3D模型，支持Open3D专业可视化。
+这是一个**螺旋排屑槽三维CAD建模工具**，使用Python直接生成带螺旋槽的圆柱体3D模型，支持Open3D专业可视化和2D侧视图生成。
 
-**核心功能**：参数化设计螺旋排屑槽，生成3D mesh模型和交互式可视化。
+**核心功能**：
+- 参数化设计螺旋排屑槽，生成3D mesh模型和交互式可视化
+- 自动生成2D侧视图，提取并处理边缘线条
+- 支持线条数据导出/导入，便于后续操作
 
 ## 主要特性
 
+### 3D建模功能
 - 🎯 **直接生成法**：不使用复杂的布尔运算，直接生成带螺旋槽的mesh
 - 📊 **专业可视化**：使用Open3D进行高性能3D可视化
 - 🎛️ **参数化设计**：灵活调整螺旋角、直径、长度等参数
@@ -16,21 +24,37 @@
 - 🔄 **自然交汇**：螺旋槽从z=0开始，自然交汇形成平滑的椭圆形顶部闭合
 - 📐 **专业级精度**：适合工业制造和CAD/CAM应用
 
+### 2D侧视图功能
+- 📐 **自动侧视图生成**：从3D模型自动生成XZ平面侧视图
+- 🎨 **智能颜色分配**：为不同类型的边缘线条分配不同颜色（16种类型×槽数）
+- 🔍 **线条去重**：全局去重处理，去除重复和重叠的线段
+- 🗑️ **智能线条过滤**：自动删除特定颜色的线条（青色、蓝色、绿色、黄色），保留重要线条
+- 💾 **数据导出/导入**：将处理后的线条坐标保存为JSON文件，支持重新绘制
+- 🔄 **自动旋转**：生成的图像自动逆时针旋转90度，便于查看
+- 📏 **自适应线条粗细**：短线条（≤5条线段）自动加粗显示，提高可见性
+
 ## 快速开始
 
-### 1. 环境要求
-- Python 3.8+
-- trimesh（必需）
-- open3d（必需，用于3D可视化）
-- matplotlib（必需，用于交互式参数调整）
+### 1. 系统要求
+
+| 系统要求 | 软件 | 软件环境 | 备注 |
+|---------|------|---------|------|
+| 操作系统 | Windows 10/11 | | 已在Windows 10上测试通过 |
+| Python版本 | Python 3.8+ | Python 3.8及以上 | 推荐使用Python 3.9或3.10 |
+| 必需库 | trimesh | trimesh | 用于3D mesh生成和处理 |
+| 必需库 | open3d | open3d | 用于3D可视化（需要Visual C++ Redistributable） |
+| 必需库 | matplotlib | matplotlib | 用于交互式参数调整和2D绘图 |
+| 必需库 | numpy | numpy | 数值计算基础库 |
+| 可选库 | Pillow | Pillow | 用于图像旋转（未安装时仅显示警告） |
 
 ### 2. 安装依赖
 ```bash
-pip install trimesh open3d matplotlib numpy
+pip install trimesh open3d matplotlib numpy Pillow
 ```
 
 ### 3. 运行程序
 
+#### 3D模型生成和可视化
 **标准模式**（Open3D可视化）：
 ```bash
 python spiral_groove_3d_cad.py
@@ -41,10 +65,21 @@ python spiral_groove_3d_cad.py
 python spiral_groove_3d_cad.py --interactive
 ```
 
-在交互式模式下：
-- 拖动滑块调整参数（D1、L1、L2、A1、槽深、槽数）
-- 3D模型会实时更新
-- 点击"Open3D查看"按钮在Open3D中查看高质量3D模型
+#### 2D侧视图生成
+**生成侧视图**（从3D模型生成）：
+```bash
+python spiral_groove_side_view.py
+```
+
+**从数据文件重新绘制**（如果已存在JSON数据文件）：
+```python
+from spiral_groove_side_view import load_and_draw_from_data
+
+load_and_draw_from_data(
+    data_file='spiral_groove_side_view_lines_data.json',
+    output_file='spiral_groove_from_data.png'
+)
+```
 
 ## 参数说明
 
@@ -59,7 +94,10 @@ python spiral_groove_3d_cad.py --interactive
 
 ## 输出文件
 
-- `spiral_groove_front.png`：前视图截图（如果使用Open3D截图功能）
+### 2D侧视图输出
+- `spiral_groove_side_view.png`：主程序生成的侧视图（自动旋转90度）
+- `spiral_groove_side_view_lines_data.json`：线条坐标数据文件（JSON格式）
+- `spiral_groove_from_data.png`：从JSON数据文件重新绘制的图像（自动旋转90度）
 
 ## 可视化说明
 
@@ -71,6 +109,16 @@ python spiral_groove_3d_cad.py --interactive
   - 螺旋槽边缘：多种颜色区分不同类型的边缘线
 - 窗口标题显示所有参数值
 - 初始视图设置为XZ正方向视角
+
+### 2D侧视图
+- 自动提取3D模型的边缘线条
+- 投影到XZ平面生成侧视图
+- 为不同类型的边缘分配不同颜色：
+  - 每个螺旋槽有16种类型的边缘线
+  - 使用不同颜色方案区分不同槽（红色系、蓝色系、绿色系、紫色系）
+- 自动去重处理，去除重复线段
+- 支持删除特定颜色的线条（如青色、蓝色等）
+- 图像自动逆时针旋转90度
 
 ### 交互式参数调整
 - 使用matplotlib滑块实时调整参数
@@ -84,6 +132,15 @@ python spiral_groove_3d_cad.py --interactive
 - **平滑过渡**：使用cos曲线和指数函数实现平滑的边缘过渡
 - **自然交汇**：螺旋槽从z=0开始，在z=0处半径逐渐缩小到0，形成自然交汇
 - **自动mesh修复**：使用trimesh和Open3D的mesh修复功能，确保模型质量
+
+### 2D侧视图处理
+- **边缘提取**：从3D mesh中提取所有边缘线条
+- **投影变换**：将3D边缘投影到XZ平面
+- **全局去重**：使用浮点精度容差进行线段去重
+- **颜色映射**：为16种边缘类型×槽数分配不同颜色
+- **智能线条过滤**：自动删除青色、蓝色、绿色、黄色线条，保留重要线条（红色、紫色等）
+- **自适应线条粗细**：根据线段数量自动调整线条宽度，短线条使用更粗的线条
+- **数据序列化**：将处理后的线条坐标保存为JSON格式，支持后续重新绘制
 
 ### 几何特性
 - **螺旋槽范围**：从z=0延伸到L1+L2
@@ -99,10 +156,11 @@ python spiral_groove_3d_cad.py --interactive
 - 支持高分辨率网格（默认400×160采样点）
 - 交互式模式使用较低分辨率以提高响应速度
 - 边缘描边使用管道（tube）mesh实现，支持批量处理
+- 侧视图生成使用优化的采样比例
 
 ## 使用示例
 
-### 基本使用
+### 基本使用（3D模型）
 ```python
 from spiral_groove_3d_cad import create_spiral_groove_mesh, visualize_open3d
 
@@ -120,12 +178,67 @@ mesh, params = create_spiral_groove_mesh(
 visualize_open3d(mesh, params=params, interactive=True)
 ```
 
+### 侧视图生成
+```python
+from spiral_groove_side_view import create_side_view, load_and_draw_from_data
+from spiral_groove_3d_cad import create_spiral_groove_mesh
+
+# 创建3D模型
+mesh, params = create_spiral_groove_mesh(
+    D1=10.0, L1=5.0, L2=150.0, A1=40.0,
+    blade_height=1.5, num_flutes=3
+)
+
+# 生成侧视图（自动保存为PNG和JSON）
+create_side_view(mesh, params, output_file='spiral_groove_side_view.png')
+
+# 从JSON数据文件重新绘制
+load_and_draw_from_data(
+    'spiral_groove_side_view_lines_data.json',
+    output_file='spiral_groove_from_data.png'
+)
+```
+
+## 线条颜色说明
+
+详细的线条颜色说明请参考 `线条颜色说明.md` 文件。
+
+主要颜色分类：
+- **端面圆周**：深蓝色（下端面）、深绿色（上端面）
+- **槽1（红色系）**：16种边缘类型，使用红色系颜色
+- **槽2（蓝色系）**：16种边缘类型，使用蓝色系颜色
+- **槽3（绿色系）**：16种边缘类型，使用绿色系颜色
+- **槽4（紫色系）**：16种边缘类型，使用紫色系颜色
+
+特殊处理：
+- **红色线条**：只保留1条最长的线段
+- **青色线条**：已自动删除（包括纯青色、亮青色、深青色等）
+- **蓝色线条**：已自动删除（包括纯蓝色、深蓝色、天蓝色等，保留紫色）
+- **绿色线条**：已自动删除（包括纯绿色、草绿色、黄绿色等）
+- **黄色线条**：已自动删除（包括纯黄色、金黄色、橙色等）
+- **短线条优化**：线段数量≤5的线条自动使用更粗的线条宽度（2.0），提高可见性
+
 ## 注意事项
 
 1. **Open3D必需**：程序需要Open3D库进行3D可视化，请确保已正确安装
 2. **Windows系统**：在Windows上可能需要安装Visual C++ Redistributable
 3. **性能考虑**：高分辨率模型可能需要较长的生成时间，建议在交互式模式下使用较低分辨率
 4. **参数范围**：建议参数在合理范围内，避免极端值导致模型异常
+5. **图像旋转**：需要Pillow库进行图像旋转，如果未安装会显示警告但不影响主要功能
+
+## 文件结构
+
+```
+.
+├── spiral_groove_3d_cad.py          # 3D模型生成主程序
+├── spiral_groove_side_view.py        # 2D侧视图生成程序
+├── 线条颜色说明.md                   # 线条颜色详细说明文档
+├── README.md                         # 本文件
+└── 输出文件/
+    ├── spiral_groove_side_view.png              # 侧视图图像
+    ├── spiral_groove_side_view_lines_data.json # 线条坐标数据
+    └── spiral_groove_from_data.png              # 从数据重新绘制的图像
+```
 
 ## 更新日志
 
@@ -135,6 +248,13 @@ visualize_open3d(mesh, params=params, interactive=True)
 - ✅ 优化可视化性能，支持高分辨率模型
 - ✅ 移除STL文件生成，专注于Open3D可视化
 - ✅ 改进交互式参数调整界面
+- ✅ 新增2D侧视图生成功能
+- ✅ 实现线条去重和颜色分配
+- ✅ 支持线条数据导出/导入（JSON格式）
+- ✅ 自动删除特定颜色的线条（青色、蓝色、绿色、黄色）
+- ✅ 图像自动旋转90度
+- ✅ 短线条自动加粗显示，提高可见性
+- ✅ 优化线条过滤逻辑，保留重要颜色（红色、紫色等）
 
 ## 许可证
 

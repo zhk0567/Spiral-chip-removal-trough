@@ -1197,10 +1197,10 @@ def visualize_open3d(mesh, params=None, interactive=True):
             vis.poll_events()
             vis.update_renderer()
             
-            # 使用高分辨率截图（4K分辨率）
-            filename = "spiral_groove_front.png"
-            vis.capture_screen_image(filename, do_render=True)
-            print(f"  已保存: {filename}")
+            # 不再生成前视图截图
+            # filename = "spiral_groove_front.png"
+            # vis.capture_screen_image(filename, do_render=True)
+            # print(f"  已保存: {filename}")
             
             vis.run()
             vis.destroy_window()
@@ -1254,9 +1254,10 @@ def visualize_open3d(mesh, params=None, interactive=True):
             vis.poll_events()
             vis.update_renderer()
             
-            filename = "spiral_groove_front.png"
-            vis.capture_screen_image(filename, do_render=True)
-            print(f"  已保存: {filename} (4K分辨率)")
+            # 不再生成前视图截图
+            # filename = "spiral_groove_front.png"
+            # vis.capture_screen_image(filename, do_render=True)
+            # print(f"  已保存: {filename} (4K分辨率)")
             
             vis.destroy_window()
             print("  截图已保存完成。")

@@ -39,3 +39,25 @@ cmake-build-release/
 .DS_Store
 Thumbs.db
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 输出文件（可选，如果不想提交生成的图片和数据文件，可以取消注释）
+# *.png
+# *.json
+
